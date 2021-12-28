@@ -59,7 +59,7 @@ def spline_conv(x: paddle.Tensor, edge_index: paddle.Tensor,
     # Weight each node.
     basis, weight_index = spline_basis(pseudo, kernel_size, is_open_spline, degree)
 
-    out = spline_weighting(x[col], weight, basis, weight_index)
+    out = spline_weighting(paddle.gather(x, col, axis=0), weight, basis, weight_index)
 
     # Convert E x M_out to N x M_out features.
     # row_expanded = row.unsqueeze(-1).expand_as(out).reshape([-1])

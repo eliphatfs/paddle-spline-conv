@@ -48,7 +48,11 @@ def spline_weighting(x, weight, basis, weight_index):
     basis/weight_index: (E, S), `spline_basis` outputs
     """
     # [ESIO -> ESOI, EI -> E1I1] -> ESO1
-    x = paddle.matmul(weight[weight_index].transpose((0, 1, 3, 2)), x.unsqueeze(1).unsqueeze(-1))
+    x = paddle.matmul(
+        paddle.gather(weight, weight_index.reshape([-1]), axis=0)
+        .reshape(weight_index.shape + weight.shape[1:]).transpose((0, 1, 3, 2)),
+        x.unsqueeze(1).unsqueeze(-1)
+    )
     x = paddle.squeeze(x, -1)  # ESO
     # [ESO -> EOS, ES -> ES1] -> EO1
     x = paddle.matmul(x.transpose((0, 2, 1)), basis.unsqueeze(-1))
